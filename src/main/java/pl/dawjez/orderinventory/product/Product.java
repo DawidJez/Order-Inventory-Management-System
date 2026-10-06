@@ -24,8 +24,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // SKU (Stock Keeping Unit) - unikalny identyfikator biznesowy produktu,
-    // niezależny od technicznego "id" bazodanowego.
+    // SKU - Stock Keeping Unit
     @Column(nullable = false, unique = true)
     private String sku;
 
@@ -35,9 +34,7 @@ public class Product {
     @Column(length = 1000)
     private String description;
 
-    // BigDecimal, nie double/float - operacje na pieniądzach wymagają
-    // dokładnej precyzji dziesiętnej, double wprowadza błędy zaokrągleń
-    // przez binarną reprezentację ułamków.
+    // BigDecimal, not float for better precision
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 

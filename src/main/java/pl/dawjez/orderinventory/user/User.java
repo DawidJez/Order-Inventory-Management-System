@@ -18,7 +18,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "users")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // wymagany przez Hibernate, niedostępny z zewnątrz
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -28,7 +28,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // Przechowywany jako hash (BCrypt) - nigdy plaintext. Ustawiane w Etapie 5.
     @Column(nullable = false)
     private String password;
 
