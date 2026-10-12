@@ -44,10 +44,11 @@ public class OrderItem {
     @Column(name = "price_at_purchase", nullable = false, precision = 10, scale = 2)
     private BigDecimal priceAtPurchase;
 
-    OrderItem(Product product, int quantity, BigDecimal priceAtPurchase) {
+    OrderItem(Order order, Product product, int quantity, BigDecimal priceAtPurchase) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Item quantity must be positive");
         }
+        this.order = order;
         this.product = product;
         this.quantity = quantity;
         this.priceAtPurchase = priceAtPurchase;
