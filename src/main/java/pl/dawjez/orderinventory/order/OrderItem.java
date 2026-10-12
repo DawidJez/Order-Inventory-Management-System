@@ -54,10 +54,6 @@ public class OrderItem {
         this.priceAtPurchase = priceAtPurchase;
     }
 
-    void assignTo(Order order) {
-        this.order = order;
-    }
-
     public BigDecimal getSubtotal() {
         return priceAtPurchase.multiply(BigDecimal.valueOf(quantity));
     }
