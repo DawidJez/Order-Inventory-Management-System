@@ -1,0 +1,69 @@
+### Create a product (initialQuantity is optional, defaults to 0)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "sku": "KB-001",
+  "name": "Mechanical keyboard",
+  "description": "Hot-swappable, 75% layout",
+  "price": 249.99,
+  "initialQuantity": 10
+}
+
+### Create the same SKU again -> expect 409
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "sku": "KB-001",
+  "name": "Duplicate",
+  "price": 1.00
+}
+
+### Invalid body (blank name, negative price) -> expect 400
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "sku": "BAD-001",
+  "name": "",
+  "price": -5
+}
+
+### Get one product
+GET http://localhost:8080/api/products/1
+
+### Get a product that does not exist -> expect 404
+GET http://localhost:8080/api/products/999
+
+### List products
+GET http://localhost:8080/api/products
+
+### Update a product
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Mechanical keyboard v2",
+  "description": "Hot-swappable, 75% layout, new switches",
+  "price": 279.99
+}
+
+### Check stock
+GET http://localhost:8080/api/products/1/stock
+
+### Restock 5 units
+POST http://localhost:8080/api/products/1/stock/restock
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+### Restock with an invalid quantity -> expect 400
+POST http://localhost:8080/api/products/1/stock/restock
+Content-Type: application/json
+
+{
+  "quantity": 0
+}
