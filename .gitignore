@@ -50,3 +50,5 @@ application-local.yaml
 logs/
 
 Thumbs.db
+
+http-client.private.env.json

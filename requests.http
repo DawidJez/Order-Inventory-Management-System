@@ -1,5 +1,93 @@
+### Variables (host, adminEmail, adminPassword) live in http-client.private.env.json (gitignored)
+
+### Register a regular user -> 201, role USER
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "firstName": "Jan",
+  "lastName": "Kowalski"
+}
+
+### Register the same email again -> expect 409
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "USER@example.com",
+  "password": "password123",
+  "firstName": "Jan",
+  "lastName": "Kowalski"
+}
+
+### Invalid registration (bad email, short password) -> expect 400
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "123",
+  "firstName": "",
+  "lastName": "X"
+}
+
+### Login as USER, saves the token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+> {% client.global.set("userToken", response.body.accessToken); %}
+
+### Login as ADMIN (credentials from .env), saves the token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {% client.global.set("adminToken", response.body.accessToken); %}
+
+### Wrong password -> expect 401
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "wrong-password"
+}
+
+### Create product without a token -> expect 401
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "sku": "NOAUTH-1",
+  "name": "No token",
+  "price": 1.00
+}
+
+### Create product as USER -> expect 403
+POST http://localhost:8080/api/products
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "sku": "USER-1",
+  "name": "As user",
+  "price": 1.00
+}
+
 ### Create a product (initialQuantity is optional, defaults to 0)
 POST http://localhost:8080/api/products
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -12,6 +100,7 @@ Content-Type: application/json
 
 ### Create the same SKU again -> expect 409
 POST http://localhost:8080/api/products
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -22,6 +111,7 @@ Content-Type: application/json
 
 ### Invalid body (blank name, negative price) -> expect 400
 POST http://localhost:8080/api/products
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -41,6 +131,7 @@ GET http://localhost:8080/api/products
 
 ### Update a product
 PUT http://localhost:8080/api/products/1
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -54,6 +145,7 @@ GET http://localhost:8080/api/products/1/stock
 
 ### Restock 5 units
 POST http://localhost:8080/api/products/1/stock/restock
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
@@ -62,6 +154,7 @@ Content-Type: application/json
 
 ### Restock with an invalid quantity -> expect 400
 POST http://localhost:8080/api/products/1/stock/restock
+Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
