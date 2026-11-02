@@ -160,3 +160,101 @@ Content-Type: application/json
 {
   "quantity": 0
 }
+
+
+### ===== Orders (needs a product with stock, e.g. product 1 restocked above, and userToken) =====
+
+### Place an order as USER -> 201, status CREATED, saves the order id
+POST http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 2 }
+  ]
+}
+
+> {% client.global.set("orderId", response.body.id); %}
+
+### Stock after the order -> quantityReserved should grow by 2
+GET http://localhost:8080/api/products/1/stock
+
+### Place an order without a token -> expect 401
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 1 }
+  ]
+}
+
+### More than available -> expect 409
+POST http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 100000 }
+  ]
+}
+
+### Unknown product -> expect 404
+POST http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 999, "quantity": 1 }
+  ]
+}
+
+### Same product twice -> expect 400
+POST http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 1 },
+    { "productId": 1, "quantity": 2 }
+  ]
+}
+
+### Empty items / quantity 0 -> expect 400
+POST http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 0 }
+  ]
+}
+
+### My orders
+GET http://localhost:8080/api/orders
+Authorization: Bearer {{userToken}}
+
+### One of my orders
+GET http://localhost:8080/api/orders/{{orderId}}
+Authorization: Bearer {{userToken}}
+
+### ADMIN sees every order
+GET http://localhost:8080/api/orders
+Authorization: Bearer {{adminToken}}
+
+### Cancel the order -> status CANCELLED
+POST http://localhost:8080/api/orders/{{orderId}}/cancel
+Authorization: Bearer {{userToken}}
+
+### Stock after cancelling -> quantityReserved back to the previous value
+GET http://localhost:8080/api/products/1/stock
+
+### Cancel again -> expect 409
+POST http://localhost:8080/api/orders/{{orderId}}/cancel
+Authorization: Bearer {{userToken}}
+

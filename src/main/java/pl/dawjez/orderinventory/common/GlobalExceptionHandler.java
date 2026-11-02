@@ -34,4 +34,15 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
+
+    // The order is valid in shape but conflicts with the current stock or order status.
+    @ExceptionHandler({InsufficientStockException.class, InvalidOrderStateException.class})
+    public ProblemDetail handleOrderConflict(RuntimeException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidOrderRequestException.class)
+    public ProblemDetail handleInvalidOrderRequest(InvalidOrderRequestException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 }
